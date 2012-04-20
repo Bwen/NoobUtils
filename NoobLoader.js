@@ -93,7 +93,7 @@ NoobLoadInit($('[data-jsinit]')[0].getAttribute('data-jsinit'), function () {
 
             if (initBuffer.length > 0) {
                 for (var i=0; i < initBuffer.length; i++) {
-                    NoobLoad(initBuffer[i][0], initBuffer[i][0]);
+                    NoobLoad(initBuffer[i][0], initBuffer[i][1]);
                 }
 
                 initBuffer = [];
