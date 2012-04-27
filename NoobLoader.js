@@ -55,6 +55,7 @@ function NoobLoadInit(files, callback) {
 
     var head = document.getElementsByTagName('head')[0]
     for (var i=0; i < files.length; i++) {
+        var fileUrl = files[i];
 
         // if we already loaded this class we callback right away and continue,
         // avoid duplicate <script> tags for the same file
@@ -63,27 +64,36 @@ function NoobLoadInit(files, callback) {
             continue;
         }
 
-        var element = document.createElement('script')
-          , fileUrl = files[i]+(!files[i].match(/\.js$/i) ? '.js' : '');
         if (!fileUrl.match(/^http[s]/i)) {
             fileUrl = noobLoaderPrefix + fileUrl;
         }
-        element.type = 'text/javascript';
-        element.src = fileUrl;
 
-        (function (index) {
-            element.onreadystatechange = function () {
+        if (files[i].match(/\.css$/i)) {
+            var element = document.createElement('link');
+            element.type = 'text/css';
+            element.rel = 'stylesheet';
+            element.href = fileUrl;
+            loadCallback(i);
+        }
+        else {
+            var element = document.createElement('script');
+            element.type = 'text/javascript';
+            element.src = fileUrl;
+
+            (function (index) {
+              element.onreadystatechange = function () {
                 if (this.readyState == 'complete') {
-                    loadCallback(index);
+                  loadCallback(index);
                 }
-            };
-        })(i);
+              };
+            })(i);
 
-        (function (index) {
-            element.onload = function () {
+            (function (index) {
+              element.onload = function () {
                 loadCallback(index);
-            }
-        })(i);
+              }
+            })(i);
+        }
         head.appendChild(element);
 
         loadedFiles[ files[i] ] = true;
