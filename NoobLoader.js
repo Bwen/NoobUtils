@@ -12,6 +12,7 @@ function NoobLoad(files, callback) {
     initBuffer.push([files, callback]);
 }
 
+var noobLoaderPrefix = $('[data-jsinit]')[0].getAttribute('src').replace(/^(http[s]:\/\/[^/]+)\/.*$/, '$1');
 function NoobLoadInit(files, callback) {
     var head, files, allLoadedAlready = 0, indexesLoaded = [], loadCallback, loadTimeout = null;
 
@@ -62,9 +63,13 @@ function NoobLoadInit(files, callback) {
             continue;
         }
 
-        var element = document.createElement('script');
+        var element = document.createElement('script')
+          , fileUrl = files[i]+(!files[i].match(/\.js$/i) ? '.js' : '');
+        if (!fileUrl.match(/^http[s]/i)) {
+            fileUrl = noobLoaderPrefix + fileUrl;
+        }
         element.type = 'text/javascript';
-        element.src = files[i]+(!files[i].match(/\.js$/i) ? '.js' : '');
+        element.src = fileUrl;
 
         (function (index) {
             element.onreadystatechange = function () {
