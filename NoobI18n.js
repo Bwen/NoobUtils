@@ -122,9 +122,19 @@ var dataTextInterval = setInterval(function () {
             id = textArgs[1];
 
         noobI18n.get(filename, id, function (text) {
+            text = noobI18n.parseText(element, text, parseQuerystring(textArgs[2]));
+
             element.removeAttribute('data-i18n');
             element.setAttribute('data-i18n-parsed', attribute);
-            element.innerHTML = noobI18n.parseText(element, text, parseQuerystring(textArgs[2]));
+
+            switch (element.tagName) {
+            case 'INPUT':
+                element.value = text;
+                break;
+            default:
+                element.innerHTML = text;
+                break;
+            }
         });
     });
 }, 300);
