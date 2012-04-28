@@ -8,20 +8,32 @@ if (jquery_version[0] < 1  || (jquery_version[0] == 1 && jquery_version[1] < 6))
 }
 
 var loadedFiles = {}, noobLoaderInitialized = false, initBuffer = [];
-function NoobLoad(files, callback) {
+function noobLoad(files, callback) {
+    "use strict";
+
     initBuffer.push([files, callback]);
 }
 
 var noobLoaderPrefix = $('[data-jsinit]')[0].getAttribute('src').replace(/^(http[s]:\/\/[^/]+)\/.*$/, '$1');
-function NoobLoadInit(files, callback) {
-    var head, files, allLoadedAlready = 0, indexesLoaded = [], loadCallback, loadTimeout = null;
+function noobLoadInit(files, callback) {
+    "use strict";
+
+    var allLoadedAlready = 0,
+        indexesLoaded = [],
+        triggerLoadCallback,
+        loadCallback,
+        loadTimeout = null,
+        i,
+        head = document.getElementsByTagName('head')[0],
+        fileUrl,
+        element;
 
     // make it so we can accept an array or a single string
-    files = [].concat( files );
+    files = [].concat(files);
 
-    for (var i=0; i < files.length; i++) {
+    for (i = 0; i < files.length; i += 1) {
         if (loadedFiles.hasOwnProperty(files[i])) {
-            allLoadedAlready++;
+            allLoadedAlready += 1;
         }
     }
 
@@ -34,8 +46,8 @@ function NoobLoadInit(files, callback) {
     }
 
     loadTimeout = setTimeout(function () {
-        var failedFiles = [];
-        for (var i=0; i < files.length; i++) {
+        var failedFiles = [], i;
+        for (i = 0; i < files.length; i += 1) {
             if (indexesLoaded.indexOf(i) === -1) {
                 failedFiles.push(files[i]);
             }
@@ -53,9 +65,18 @@ function NoobLoadInit(files, callback) {
         }
     };
 
-    var head = document.getElementsByTagName('head')[0]
-    for (var i=0; i < files.length; i++) {
-        var fileUrl = files[i];
+    triggerLoadCallback = function (element, index) {
+        return function () {
+            if (element.hasOwnProperty('readyState') && element.readyState == 'complete') {
+                loadCallback(index);
+            } else {
+                loadCallback(index);
+            }
+        };
+    };
+
+    for (i = 0; i < files.length; i += 1) {
+        fileUrl = files[i];
 
         // if we already loaded this class we callback right away and continue,
         // avoid duplicate <script> tags for the same file
@@ -69,46 +90,36 @@ function NoobLoadInit(files, callback) {
         }
 
         if (files[i].match(/\.css$/i)) {
-            var element = document.createElement('link');
+            element = document.createElement('link');
             element.type = 'text/css';
             element.rel = 'stylesheet';
             element.href = fileUrl;
             loadCallback(i);
-        }
-        else {
-            var element = document.createElement('script');
+        } else {
+            element = document.createElement('script');
             element.type = 'text/javascript';
             element.src = fileUrl;
 
-            (function (index) {
-              element.onreadystatechange = function () {
-                if (this.readyState == 'complete') {
-                  loadCallback(index);
-                }
-              };
-            })(i);
-
-            (function (index) {
-              element.onload = function () {
-                loadCallback(index);
-              }
-            })(i);
+            element.onreadystatechange = triggerLoadCallback(i);
+            element.onload = triggerLoadCallback(i);
         }
         head.appendChild(element);
 
-        loadedFiles[ files[i] ] = true;
+        loadedFiles[files[i]] = true;
     }
 }
 
-NoobLoadInit($('[data-jsinit]')[0].getAttribute('data-jsinit'), function () {
-    var bufferInterval = setInterval(function () {
+noobLoadInit($('[data-jsinit]')[0].getAttribute('data-jsinit'), function () {
+    "use strict";
+
+    var i, bufferInterval = setInterval(function () {
         if (noobLoaderInitialized) {
-            NoobLoad = NoobLoadInit;
-            NoobLoadInit = null;
+            noobLoad = noobLoadInit;
+            noobLoadInit = null;
 
             if (initBuffer.length > 0) {
-                for (var i=0; i < initBuffer.length; i++) {
-                    NoobLoad(initBuffer[i][0], initBuffer[i][1]);
+                for (i = 0; i < initBuffer.length; i += 1) {
+                    noobLoad(initBuffer[i][0], initBuffer[i][1]);
                 }
 
                 initBuffer = [];
