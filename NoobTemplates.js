@@ -15,8 +15,8 @@ NoobTemplates.prototype.get = function get(filename, callback) {
         callback(undefined, templateFiles[filename]);
     } else if (!loadingFiles.hasOwnProperty(filename)) {
         loadingFiles[filename] = true;
-        socketio.static_files.emit('fetch', file);
-        socketio.static_files.on(file, function socketioFile(err, html) {
+        socketio.noobhttp.emit('request', file);
+        socketio.noobhttp.on(file, function socketioFile(err, html) {
             if (err) {
                 callback(err, undefined);
                 return;

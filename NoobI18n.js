@@ -55,8 +55,8 @@ NoobI18n.prototype.get = function get() {
         file =  filename.replace(/\{lang\}/i, settings.lang) + '.json';
         loadingFiles[filename] = true;
 
-        socketio.static_files.emit('fetch', file);
-        socketio.static_files.on(file, function socketio_file(err, i18nJson) {
+        socketio.noobhttp.emit('request', file);
+        socketio.noobhttp.on(file, function socketio_file(err, i18nJson) {
             if (err) {
                 console.error(err.msg);
                 return;
