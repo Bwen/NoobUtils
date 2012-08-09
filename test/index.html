@@ -1,0 +1,27 @@
+{noobhttp-layout}
+<script type="text/javascript" src="http://localhost:8000/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+
+console.log('pop');
+
+var domain = 'http://localhost:8000',
+  root = io.connect(domain+'/');
+  smartservers = io.connect(domain+'/smartservers'),
+  client = io.connect(domain+'/client');
+
+root.on('error', function (err_msg) {
+  console.error('No login cookie: '+ err_msg);
+});
+
+smartservers.on('server', function(server) {
+  console.log('EVENT server', server);
+});
+
+
+client.on('details', function(details) {
+  console.log('EVENT details:', details);
+});
+
+
+</script>
+

@@ -47,10 +47,10 @@ NoobI18n.prototype.get = function get() {
     }
 
     if (textFiles[settings.lang].hasOwnProperty(filename)) {
-        response(findTextById(id, textFiles[settings.lang][filename]), callback);
+        return response(findTextById(id, textFiles[settings.lang][filename]), callback);
     } else if (localStorage != undefined && localStorage.hasOwnProperty(filename)) {
         textFiles[settings.lang][filename] = localStorage[filename];
-        response(findTextById(id, textFiles[settings.lang][filename]), callback);
+        return response(findTextById(id, textFiles[settings.lang][filename]), callback);
     } else if (!loadingFiles.hasOwnProperty(filename)) {
         file =  filename.replace(/\{lang\}/i, settings.lang) + '.json';
         loadingFiles[filename] = true;
@@ -66,16 +66,16 @@ NoobI18n.prototype.get = function get() {
             if (textFile) {
                 textFiles[settings.lang][filename] = textFile;
                 // localStorage[localStorageIndex] = text;
-                response(findTextById(id, textFiles[settings.lang][filename]), callback);
+                return response(findTextById(id, textFiles[settings.lang][filename]), callback);
             } else {
-                response(undefined, callback);
+                return response(undefined, callback);
             }
             delete loadingFiles[filename];
         });
     }
 };
 
-NoobI18n.prototype.parseText = function parseText(element, text, replacements) {
+NoobI18n.prototype.parseText = function parseText(text, replacements) {
     "use strict";
     var key, parts, originalVar, currentVar, i, value, marker;
 
@@ -122,7 +122,7 @@ var dataTextInterval = setInterval(function () {
             id = textArgs[1];
 
         noobI18n.get(filename, id, function (text) {
-            text = noobI18n.parseText(element, text, parseQuerystring(textArgs[2]));
+            text = noobI18n.parseText(text, parseQuerystring(textArgs[2]));
 
             element.removeAttribute('data-i18n');
             element.setAttribute('data-i18n-parsed', attribute);
@@ -137,4 +137,4 @@ var dataTextInterval = setInterval(function () {
             }
         });
     });
-}, 300);
+}, 200);
